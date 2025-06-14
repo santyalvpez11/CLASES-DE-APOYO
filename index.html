@@ -75,7 +75,6 @@
         <!-- Landing Page View -->
         <div id="landing-view" class="w-full max-w-4xl mx-auto fade-in">
              <div class="relative bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
-                <!-- Professor Login Button -->
                 <div class="absolute top-4 right-4">
                      <button data-action="show-professor-login" class="text-sm font-semibold text-teal-700 hover:text-teal-900">Acceso Profesores</button>
                 </div>
@@ -252,19 +251,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             const app = {
                 // --- State ---
-                USER_STATE: null, 
-
+                USER_STATE: null,
+                
                 init() {
-                    this.cacheElements();
+                    this.elements = this.cacheElements();
                     this.addEventListeners();
                 },
 
                 cacheElements() {
-                    const ids = ['landing-container', 'scheduler-container', 'professor-panel-view', 'initial-choice-view', 'panel-view', 'panel-options', 'user-name', 'booking-modal', 'success-modal', 'my-classes-modal', 'quienes-somos-modal', 'professor-login-modal', 'homework-modal'];
-                    this.elements = {};
+                    const ids = ['landing-container', 'professor-panel-view', 'initial-choice-view', 'panel-view', 'panel-options', 'user-name', 'booking-modal', 'success-modal', 'my-classes-modal', 'quienes-somos-modal', 'professor-login-modal', 'homework-modal'];
+                    const elements = {};
                     ids.forEach(id => {
-                        this.elements[id] = document.getElementById(id);
+                        elements[id] = document.getElementById(id);
                     });
+                    return elements;
                 },
 
                 addEventListeners() {
@@ -278,50 +278,34 @@
                     if (!action) return;
 
                     const actions = {
-                        'login-google': () => {
-                            this.USER_STATE = { name: "Santiago", email: "santy@ejemplo.com" };
-                            this.updatePanelView();
-                        },
-                        'login-guest': () => {
-                            this.USER_STATE = 'GUEST';
-                            this.updatePanelView();
-                        },
-                        'logout': () => {
-                            this.USER_STATE = null;
-                            this.showView('landing-container');
-                            this.elements.initialChoiceView.classList.remove('hidden');
-                            this.elements.panelView.classList.add('hidden');
-                            document.body.classList.add('pattern-bg');
-                        },
-                        'show-booking-modal': () => {
-                            this.showView('scheduler-container');
-                        },
-                        'show-my-classes': () => this.myClassesModalLogic(),
-                        'show-homework-request': () => this.showHomeworkModal(),
+                        'login-google': this.loginWithGoogle,
+                        'login-guest': this.loginAsGuest,
+                        'logout': this.logout,
+                        'show-booking-modal': this.showBookingModal,
+                        'show-my-classes': this.myClassesModalLogic,
+                        'show-homework-request': this.showHomeworkModal,
                         'show-about-us': () => this.showModal('quienes-somos-modal'),
                         'show-professor-login': () => this.showModal('professor-login-modal'),
                         'close-modal': () => {
                             const modalId = e.target.closest('[data-modal-id]').dataset.modalId;
                             this.hideModal(modalId);
                         },
-                        'back-to-panel': () => {
-                            this.showView('landing-container');
-                            this.updatePanelView();
-                        }
                     };
 
                     if (actions[action]) {
-                        actions[action]();
+                        actions[action].call(this);
                     }
                 },
                 
                 showView(viewId) {
-                    ['landing-container', 'scheduler-container', 'professor-panel-view'].forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) el.classList.add('hidden');
+                    Object.values(this.elements).forEach(el => {
+                        if (el && el.id !== 'modal-container' && !el.classList.contains('modal')) {
+                           // el.classList.add('hidden');
+                        }
                     });
-                    const viewToShow = document.getElementById(viewId);
-                    if (viewToShow) viewToShow.classList.remove('hidden');
+                    if (this.elements[viewId]) {
+                        this.elements[viewId].classList.remove('hidden');
+                    }
                 },
 
                 updatePanelView() {
@@ -343,13 +327,30 @@
                             <div data-action="show-homework-request" class="main-card actionable flex items-center space-x-6">...</div>`;
                     }
                 },
-                
+
+                loginWithGoogle() {
+                    this.USER_STATE = { name: "Santiago", email: "santy@ejemplo.com" };
+                    this.updatePanelView();
+                },
+                loginAsGuest() {
+                    this.USER_STATE = 'GUEST';
+                    this.updatePanelView();
+                },
+                logout() {
+                    this.USER_STATE = null;
+                    this.showView('landing-container');
+                    this.elements.initialChoiceView.classList.remove('hidden');
+                    this.elements.panelView.classList.add('hidden');
+                    document.body.classList.add('pattern-bg');
+                },
+                showBookingModal() {
+                    alert("Launch booking wizard");
+                },
                 myClassesModalLogic() {
                     const list = this.elements.myClassesModal.querySelector('#my-classes-list');
-                    list.innerHTML = `...`; 
+                    list.innerHTML = `...`; // Content for "My Classes"
                     this.showModal('my-classes-modal');
                 },
-
                 showHomeworkModal() {
                     const hwGuestInfo = this.elements.homeworkModal.querySelector('#homework-guest-info');
                     const inputs = hwGuestInfo.querySelectorAll('input');
@@ -362,7 +363,6 @@
                     }
                     this.showModal('homework-modal');
                 },
-                
                 showModal(modalId) {
                     const modalElement = document.getElementById(modalId);
                     if (!modalElement) return;
@@ -372,7 +372,6 @@
                         modalElement.querySelector('.modal-content').classList.remove('scale-95');
                     }, 10);
                 },
-
                 hideModal(modalId) {
                     const modalElement = document.getElementById(modalId);
                     if (!modalElement) return;
@@ -380,9 +379,11 @@
                     modalElement.querySelector('.modal-content').classList.add('scale-95');
                     setTimeout(() => {
                         modalElement.classList.add('hidden');
+                        if (modalId === 'success-modal') {
+                           this.showView('landing-container');
+                        }
                     }, 300);
                 },
-                
                 handleProfessorLogin(e) {
                     e.preventDefault();
                     const password = e.target.querySelector('#prof-password').value;
@@ -397,7 +398,6 @@
                         errorEl.classList.remove('hidden');
                     }
                 },
-                
                 handleHomeworkSubmit(e) {
                     e.preventDefault();
                     this.hideModal('homework-modal', () => {
