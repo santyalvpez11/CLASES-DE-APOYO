@@ -19,6 +19,7 @@
             background-color: #f0fdfa; /* teal-50 */
             transition: background-color 0.5s ease;
         }
+        /* New background pattern style, only active when body has .pattern-bg class */
         body.pattern-bg::before {
             content: "";
             position: fixed;
@@ -43,131 +44,166 @@
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.1);
             cursor: pointer;
         }
+
         .calendar-day {
             transition: all 0.2s ease-in-out;
-            border-radius: 9999px;
         }
         .calendar-day:not(.disabled):hover {
-            background-color: #ccfbf1;
-            color: #115e59;
+            background-color: #ccfbf1; /* teal-200 */
+            color: #115e59; /* teal-800 */
             transform: scale(1.05);
         }
         .calendar-day.selected {
-            background-color: #0d9488;
+            background-color: #0d9488; /* teal-600 */
             color: white;
             font-weight: bold;
         }
-        .time-slot.selected {
-            background-color: #0d9488;
-            color: white;
-            border-color: #0d9488;
+        .time-slot {
+            transition: all 0.2s ease-in-out;
         }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .modal { transition: opacity 0.3s ease; }
-        .modal-content { transition: transform 0.3s ease; }
+        .time-slot.selected {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            border-color: #0d9488; /* teal-600 */
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
     </style>
 </head>
 <body class="text-gray-800 flex items-center justify-center min-h-screen p-4 pattern-bg">
 
-    <!-- Views Container -->
-    <div class="w-full">
-        <!-- Landing Page View -->
-        <div id="landing-view" class="w-full max-w-4xl mx-auto fade-in">
-             <div class="relative bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
-                <div class="absolute top-4 right-4">
-                     <button data-action="show-professor-login" class="text-sm font-semibold text-teal-700 hover:text-teal-900">Acceso Profesores</button>
-                </div>
-
-                <div id="initial-choice-view" class="grid md:grid-cols-2 gap-12 items-center">
-                    <div class="text-center md:text-left">
-                        <h1 class="text-4xl md:text-5xl font-bold text-teal-800 leading-tight">Clases de Apoyo</h1>
-                        <p class="text-gray-500 mt-4 mb-8 text-lg">Tu camino al éxito académico empieza aquí.</p>
-                        <div class="space-y-4">
-                            <button data-action="login-google" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg shadow-sm inline-flex items-center justify-center text-lg">
-                                <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M48 24C48 22.0427 47.8438 20.125 47.5469 18.25H24.4688V28.8281H37.8281C37.2812 32.2188 35.5312 35.0156 32.6562 36.9219V43.2656H41.4375C45.6562 39.3125 48 32.25 48 24Z" fill="#4285F4"></path><path d="M24.4688 48C31.0625 48 36.5938 45.6875 41.4375 42.2656L32.6562 36.9219C30.3438 38.5 27.6562 39.4375 24.4688 39.4375C18.6562 39.4375 13.625 35.6875 11.9375 30.2969H2.875V36.7969C7.6875 43.6875 15.5 48 24.4688 48Z" fill="#34A853"></path><path d="M11.9375 30.2969C11.4375 28.8281 11.125 27.25 11.125 25.5781C11.125 23.9062 11.4375 22.3281 11.9375 20.8594V14.3594H2.875C1.04688 18.0156 0 21.6562 0 25.5781C0 29.5 1.04688 33.1406 2.875 36.7969L11.9375 30.2969Z" fill="#FBBC05"></path><path d="M24.4688 11.7188C28.0938 11.7188 31.3281 12.9688 33.7812 15.2656L41.6562 7.39062C36.5938 2.8125 31.0625 0 24.4688 0C15.5 0 7.6875 4.3125 2.875 11.2031L11.9375 17.7031C13.625 12.3125 18.6562 8.5625 24.4688 8.5625V11.7188Z" fill="#EA4335"></path></svg>
-                                Iniciar Sesión con Google
-                            </button>
-                            <button data-action="login-guest" class="w-full text-teal-700 font-semibold py-3 px-6 rounded-lg hover:bg-teal-100">Continuar como invitado</button>
-                        </div>
-                         <div class="mt-8 border-t pt-4 text-center">
-                            <button data-action="show-about-us" class="text-sm text-gray-500 hover:text-teal-700 hover:underline">¿Quiénes Somos?</button>
-                        </div>
+    <!-- Landing Page Container -->
+    <div id="landing-container" class="w-full max-w-4xl fade-in">
+        <div id="auth-container">
+            <!-- Initial choice state -->
+            <div id="initial-choice-view" class="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl grid md:grid-cols-2 gap-12 items-center">
+                <div class="text-center md:text-left">
+                    <h1 class="text-4xl md:text-5xl font-bold text-teal-800 leading-tight">Clases de Apoyo</h1>
+                    <p class="text-gray-500 mt-4 mb-8 text-lg">Tu camino al éxito académico empieza aquí.</p>
+                    <div class="space-y-4">
+                        <button id="google-signin-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg shadow-sm inline-flex items-center justify-center text-lg">
+                            <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M48 24C48 22.0427 47.8438 20.125 47.5469 18.25H24.4688V28.8281H37.8281C37.2812 32.2188 35.5312 35.0156 32.6562 36.9219V43.2656H41.4375C45.6562 39.3125 48 32.25 48 24Z" fill="#4285F4"></path><path d="M24.4688 48C31.0625 48 36.5938 45.6875 41.4375 42.2656L32.6562 36.9219C30.3438 38.5 27.6562 39.4375 24.4688 39.4375C18.6562 39.4375 13.625 35.6875 11.9375 30.2969H2.875V36.7969C7.6875 43.6875 15.5 48 24.4688 48Z" fill="#34A853"></path><path d="M11.9375 30.2969C11.4375 28.8281 11.125 27.25 11.125 25.5781C11.125 23.9062 11.4375 22.3281 11.9375 20.8594V14.3594H2.875C1.04688 18.0156 0 21.6562 0 25.5781C0 29.5 1.04688 33.1406 2.875 36.7969L11.9375 30.2969Z" fill="#FBBC05"></path><path d="M24.4688 11.7188C28.0938 11.7188 31.3281 12.9688 33.7812 15.2656L41.6562 7.39062C36.5938 2.8125 31.0625 0 24.4688 0C15.5 0 7.6875 4.3125 2.875 11.2031L11.9375 17.7031C13.625 12.3125 18.6562 8.5625 24.4688 8.5625V11.7188Z" fill="#EA4335"></path></svg>
+                            Iniciar Sesión con Google
+                        </button>
+                        <button id="guest-btn" class="w-full text-teal-700 font-semibold py-3 px-6 rounded-lg hover:bg-teal-100">Continuar como invitado</button>
                     </div>
-                    <div class="hidden md:flex items-center justify-center">
-                        <svg class="w-full h-auto" viewBox="0 0 453 388" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M226.5 388C351.623 388 453 293.734 453 194C453 94.266 351.623 0 226.5 0C101.377 0 0 94.266 0 194C0 293.734 101.377 388 226.5 388Z" fill="#F0F9FF"/>
-                            <path d="M226 250.5C271.724 250.5 309 217.168 309 176.5C309 135.832 271.724 102.5 226 102.5C180.276 102.5 143 135.832 143 176.5C143 217.168 180.276 250.5 226 250.5Z" fill="#2DD4BF"/>
-                            <path d="M272 176.5C272 199.337 251.337 218.5 226 218.5C200.663 218.5 181 199.337 181 176.5C181 153.663 200.663 134.5 226 134.5C251.337 134.5 272 153.663 272 176.5Z" fill="#5EEAD4"/>
-                            <path d="M291.5 304.5H160.5C150.835 304.5 143 296.665 143 287V250.5H309V287C309 296.665 301.165 304.5 291.5 304.5Z" fill="#99F6E4"/>
-                        </svg>
+                     <div class="mt-8">
+                        <button id="quienes-somos-btn" class="text-sm text-gray-500 hover:text-teal-700 hover:underline">¿Quiénes Somos?</button>
                     </div>
                 </div>
-                 <!-- Signed in/Guest state -->
-                <div id="panel-view" class="hidden max-w-2xl mx-auto text-center">
-                     <div class="flex justify-between items-center mb-8">
-                        <p class="text-gray-700">Hola, <span id="user-name" class="font-bold"></span></p>
-                        <button data-action="logout" class="text-sm font-semibold text-red-600 hover:text-red-800">Cerrar Sesión</button>
-                    </div>
-                    <h2 class="text-3xl font-bold text-teal-800 mb-8">Panel de Estudiante</h2>
-                    <div id="panel-options" class="flex flex-col space-y-6">
-                        <!-- Options will be injected here -->
-                    </div>
+                <div class="hidden md:flex items-center justify-center">
+                    <svg class="w-full h-auto" viewBox="0 0 453 388" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M226.5 388C351.623 388 453 293.734 453 194C453 94.266 351.623 0 226.5 0C101.377 0 0 94.266 0 194C0 293.734 101.377 388 226.5 388Z" fill="#F0F9FF"/>
+                        <path d="M226 250.5C271.724 250.5 309 217.168 309 176.5C309 135.832 271.724 102.5 226 102.5C180.276 102.5 143 135.832 143 176.5C143 217.168 180.276 250.5 226 250.5Z" fill="#2DD4BF"/>
+                        <path d="M272 176.5C272 199.337 251.337 218.5 226 218.5C200.663 218.5 181 199.337 181 176.5C181 153.663 200.663 134.5 226 134.5C251.337 134.5 272 153.663 272 176.5Z" fill="#5EEAD4"/>
+                        <path d="M291.5 304.5H160.5C150.835 304.5 143 296.665 143 287V250.5H309V287C309 296.665 301.165 304.5 291.5 304.5Z" fill="#99F6E4"/>
+                    </svg>
                 </div>
             </div>
-        </div>
-        
-        <!-- Professor Panel -->
-        <div id="professor-panel-view" class="w-full max-w-4xl bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-xl hidden fade-in">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl font-bold text-teal-800">Panel de Profesor</h2>
-                <button data-action="logout" class="text-sm font-semibold text-red-600 hover:text-red-800">Cerrar Sesión</button>
-            </div>
-            <p class="mb-2 text-lg">Bienvenido, <span class="font-bold">Sebastian Escobar</span>.</p>
-            <p class="text-gray-500 mb-6">Estas son tus clases asignadas para los próximos días:</p>
-            <div class="space-y-3">
-                 <div class="bg-gray-50 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                    <div class="mb-2 sm:mb-0">
-                        <p class="font-bold text-gray-800">Clase de Álgebra</p>
-                        <p class="text-sm text-gray-500">viernes, 20 de junio de 2025 - 11:00 (1 Hora)</p>
-                         <p class="text-xs text-gray-500 mt-1">Estudiante: Santiago (santy@ejemplo.com)</p>
-                    </div>
-                    <span class="text-sm font-medium text-teal-700 bg-teal-100 px-3 py-1 rounded-full">Confirmada</span>
+             <!-- Signed in/Guest state -->
+            <div id="panel-view" class="hidden max-w-2xl mx-auto text-center">
+                 <div class="flex justify-between items-center mb-8">
+                    <p class="text-gray-700">Hola, <span id="user-name" class="font-bold"></span></p>
+                    <button id="back-to-auth-choice-btn" class="text-sm font-semibold text-red-600 hover:text-red-800">Cerrar Sesión</button>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                    <div class="mb-2 sm:mb-0">
-                        <p class="font-bold text-gray-800">Clase de Cálculo</p>
-                        <p class="text-sm text-gray-500">lunes, 23 de junio de 2025 - 15:00 (45 Minutos)</p>
-                        <p class="text-xs text-gray-500 mt-1">Estudiante: Invitado (invitado@test.com / 3001234567)</p>
-                    </div>
-                    <span class="text-sm font-medium text-teal-700 bg-teal-100 px-3 py-1 rounded-full">Confirmada</span>
+                <h2 class="text-3xl font-bold text-teal-800 mb-8">Panel de Estudiante</h2>
+                <div id="panel-options" class="flex flex-col space-y-6">
+                    <!-- Options will be injected here -->
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Modals -->
-    <div id="modal-container">
-        <!-- Main Booking Modal -->
-        <div id="booking-modal" class="modal fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 hidden opacity-0">
-            <div id="booking-modal-content" class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-xl transform scale-95 overflow-hidden">
-                <!-- Step content is dynamically loaded here -->
+
+    <!-- Scheduler Container -->
+    <div id="scheduler-container" class="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-6 md:p-8 hidden fade-in relative">
+        <button id="back-to-panel-btn" class="absolute top-5 left-6 text-teal-600 hover:text-teal-800 flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" /></svg>
+            <span class="font-semibold">Volver</span>
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 mt-10">
+            <div class="border-r-0 md:border-r md:pr-8 border-gray-200">
+                <h2 class="text-2xl font-bold text-teal-800 mb-1">Agenda tu Clase</h2>
+                 <div>
+                    <label for="duration" class="block text-sm font-medium text-gray-700 mt-4 mb-1">Paso 1: Elige la duración</label>
+                    <select id="duration" name="duration" class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <option value="45">45 Minutos</option>
+                        <option value="60" selected>1 Hora</option>
+                        <option value="120">2 Horas</option>
+                        <option value="180">3 Horas</option>
+                        <option value="240">4 Horas</option>
+                    </select>
+                </div>
+                <label class="block text-sm font-medium text-gray-700 mt-6 mb-1">Paso 2: Elige el día</label>
+                <div class="flex items-center justify-between mb-4">
+                    <button id="prev-month" class="p-2 rounded-full hover:bg-gray-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <h3 id="month-year" class="text-lg font-semibold w-32 text-center text-teal-700"></h3>
+                    <button id="next-month" class="p-2 rounded-full hover:bg-gray-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center font-medium text-gray-400 text-sm"><div>Do</div><div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sá</div></div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2 mt-2"></div>
+            </div>
+            <div id="time-slot-view" class="flex flex-col justify-center hidden fade-in">
+                 <label class="block text-sm font-medium text-gray-700 mb-1">Paso 3: Elige la hora</label>
+                 <p id="time-slot-subtitle" class="text-xs text-gray-500 mb-2"></p>
+                 <div id="time-slots" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+                 <div id="confirmation-section" class="hidden mt-6 fade-in">
+                    <form id="booking-form" class="space-y-5">
+                        <label class="block text-sm font-bold text-gray-700">Paso 4: Confirma tus datos y pago</label>
+                        <div id="guest-info" class="space-y-4">
+                            <div><label for="name" class="block text-sm font-medium text-gray-700">Tu Nombre</label><input type="text" id="name" class="mt-1 block w-full bg-gray-50 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
+                            <div><label for="email" class="block text-sm font-medium text-gray-700">Tu Correo Electrónico</label><input type="email" id="email" class="mt-1 block w-full bg-gray-50 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
+                             <div><label for="phone" class="block text-sm font-medium text-gray-700">Tu Celular</label><input type="tel" id="phone" class="mt-1 block w-full bg-gray-50 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
+                        </div>
+                        <div>
+                             <label class="block text-sm font-medium text-gray-700">Método de Pago</label>
+                             <div class="mt-2 space-y-2">
+                                <div class="flex items-center"><input id="pago-efectivo" name="payment" type="radio" value="efectivo" class="h-4 w-4 text-teal-600 border-gray-300 focus:ring-teal-500"><label for="pago-efectivo" class="ml-3 block text-sm text-gray-900">Efectivo</label></div>
+                                <div class="flex items-center"><input id="pago-transferencia" name="payment" type="radio" value="transferencia" class="h-4 w-4 text-teal-600 border-gray-300 focus:ring-teal-500"><label for="pago-transferencia" class="ml-3 block text-sm text-gray-900">Transferencia</label></div>
+                             </div>
+                        </div>
+                        <div id="efectivo-details" class="hidden p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm"><p>El valor de <strong id="valor-clase-efectivo"></strong> se paga el día de la clase.</p></div>
+                        <div id="transferencia-details" class="hidden p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm space-y-1">
+                           <p>Transfiere <strong id="valor-clase-transferencia"></strong> a la siguiente cuenta:</p>
+                           <p><strong>Bancolombia Ahorros:</strong> 123-456789-00</p>
+                           <p>Luego, envía el comprobante a nuestro WhatsApp.</p>
+                        </div>
+                        <button type="submit" class="w-full mt-6 py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:bg-gray-400">Confirmar Clase</button>
+                    </form>
+                 </div>
+            </div>
+            <div id="initial-message" class="flex flex-col items-center justify-center text-center col-span-1 md:col-start-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                <p class="text-gray-500">Completa los pasos para agendar.</p>
             </div>
         </div>
-        
+    </div>
+    
+    <!-- Modals & Floating Buttons -->
+    <div id="modal-container">
         <div id="success-modal" class="modal fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 hidden opacity-0">
             <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-md p-6 md:p-8 transform scale-95 text-center">
                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-teal-100 mb-4"><svg class="h-10 w-10 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div>
-                <h3 id="success-modal-title" class="text-2xl leading-6 font-bold text-gray-900">¡Reserva Completada!</h3>
+                <h3 class="text-2xl leading-6 font-bold text-gray-900">¡Clase Agendada!</h3>
                 <div id="confirm-details" class="mt-4 text-left bg-gray-50 p-4 rounded-lg space-y-2"></div>
-                <div class="mt-6"><button data-action="close-modal" data-modal-id="success-modal" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-teal-600 text-base font-medium text-white hover:bg-teal-700 focus:outline-none sm:text-sm">¡Listo!</button></div>
+                <div class="mt-6"><button id="success-modal-close-btn" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-teal-600 text-base font-medium text-white hover:bg-teal-700 focus:outline-none sm:text-sm">¡Listo!</button></div>
             </div>
         </div>
         <div id="my-classes-modal" class="modal fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 hidden opacity-0">
-            <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 md:p-8 transform scale-95">
+            <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-md p-6 md:p-8 transform scale-95">
                  <h3 class="text-2xl leading-6 font-bold text-gray-900 text-center mb-6">Tus Próximas Clases</h3>
                  <div id="my-classes-list" class="space-y-3"></div>
-                 <div class="mt-6"><button data-action="close-modal" data-modal-id="my-classes-modal" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm">Cerrar</button></div>
+                 <div class="mt-6"><button id="my-classes-modal-close-btn" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm">Cerrar</button></div>
             </div>
         </div>
         <div id="quienes-somos-modal" class="modal fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 hidden opacity-0">
@@ -178,63 +214,7 @@
                     <p>Nuestra meta es transformar la frustración en seguridad y los desafíos académicos en logros personales. No solo enseñamos materias; construimos habilidades, fomentamos la curiosidad y acompañamos a cada estudiante en su camino hacia el éxito.</p>
                     <p class="font-semibold text-teal-700">Somos más que clases, somos un equipo dedicado a potenciar tu talento.</p>
                  </div>
-                 <div class="mt-6"><button data-action="close-modal" data-modal-id="quienes-somos-modal" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm">Entendido</button></div>
-            </div>
-        </div>
-         <div id="professor-login-modal" class="modal fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 hidden opacity-0">
-            <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 md:p-8 transform scale-95">
-                 <h3 class="text-2xl leading-6 font-bold text-gray-900 text-center mb-4">Acceso para Profesores</h3>
-                 <form id="professor-login-form">
-                    <div class="space-y-4">
-                        <div>
-                            <label for="prof-password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                            <input type="password" id="prof-password" required class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                        </div>
-                        <p id="prof-login-error" class="text-red-500 text-sm text-center hidden">Contraseña incorrecta.</p>
-                        <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none">Continuar</button>
-                    </div>
-                 </form>
-                 <button data-action="close-modal" data-modal-id="professor-login-modal" class="w-full mt-2 text-sm text-gray-500 hover:underline">Cancelar</button>
-            </div>
-        </div>
-         <div id="homework-modal" class="modal fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 hidden opacity-0">
-            <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 md:p-8 transform scale-95">
-                 <h3 class="text-2xl leading-6 font-bold text-gray-900 text-center mb-2">Solicitud de Apoyo con Tarea</h3>
-                 <p class="text-center text-gray-500 mb-6 text-sm">Completa el formulario y te enviaremos una cotización.</p>
-                 <form id="homework-form" class="space-y-4">
-                    <div id="homework-guest-info" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label for="hw-name" class="block text-sm font-medium text-gray-700">Tu Nombre</label><input type="text" id="hw-name" required class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
-                            <div><label for="hw-phone" class="block text-sm font-medium text-gray-700">Tu Celular</label><input type="tel" id="hw-phone" required class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
-                        </div>
-                        <div><label for="hw-email" class="block text-sm font-medium text-gray-700">Tu Correo Electrónico</label><input type="email" id="hw-email" required class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="hw-subject" class="block text-sm font-medium text-gray-700">Materia</label>
-                            <select id="hw-subject" required class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                                <option>Matemáticas</option><option>Física</option><option>Química</option><option>Ciencias Sociales</option><option>Lenguaje</option><option>Otra</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="hw-type" class="block text-sm font-medium text-gray-700">Tipo de Trabajo</label>
-                            <select id="hw-type" required class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                                <option>Ensayo / Informe</option><option>Análisis de Datos (Excel)</option><option>Presentación</option><option>Taller / Cuestionario</option><option>Otro</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                         <label for="hw-description" class="block text-sm font-medium text-gray-700">Describe tu tarea</label>
-                         <textarea id="hw-description" rows="3" required class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="Ej: Necesito ayuda para analizar una encuesta en Excel y generar 3 gráficos..."></textarea>
-                    </div>
-                     <div class="text-xs text-gray-500 bg-gray-50 p-3 rounded-md">
-                        <strong>Precios de referencia:</strong> Talleres desde $25.000, Ensayos desde $50.000, Análisis de Datos desde $70.000. El valor final dependerá de la complejidad y se enviará en la cotización a tu correo.
-                     </div>
-                    <div class="pt-2">
-                        <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none">Enviar Solicitud</button>
-                    </div>
-                 </form>
-                 <button data-action="close-modal" data-modal-id="homework-modal" class="w-full mt-2 text-sm text-gray-500 hover:underline">Cancelar</button>
+                 <div class="mt-6"><button id="quienes-somos-modal-close-btn" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm">Entendido</button></div>
             </div>
         </div>
     </div>
@@ -249,172 +229,340 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const app = {
-                // --- State ---
-                USER_STATE: null,
-                
-                init() {
-                    this.elements = this.cacheElements();
-                    this.addEventListeners();
-                },
+            let USER_STATE = null; 
 
-                cacheElements() {
-                    const ids = ['landing-container', 'professor-panel-view', 'initial-choice-view', 'panel-view', 'panel-options', 'user-name', 'booking-modal', 'success-modal', 'my-classes-modal', 'quienes-somos-modal', 'professor-login-modal', 'homework-modal'];
-                    const elements = {};
-                    ids.forEach(id => {
-                        elements[id] = document.getElementById(id);
-                    });
-                    return elements;
-                },
+            // --- Views & Buttons ---
+            const landingContainer = document.getElementById('landing-container');
+            const schedulerContainer = document.getElementById('scheduler-container');
+            const initialChoiceView = document.getElementById('initial-choice-view');
+            const panelView = document.getElementById('panel-view');
+            const googleSigninBtn = document.getElementById('google-signin-btn');
+            const guestBtn = document.getElementById('guest-btn');
+            const backToAuthChoiceBtn = document.getElementById('back-to-auth-choice-btn');
+            const panelOptions = document.getElementById('panel-options');
+            const backToPanelBtn = document.getElementById('back-to-panel-btn');
+            const quienesSomosBtn = document.getElementById('quienes-somos-btn');
 
-                addEventListeners() {
-                    document.body.addEventListener('click', this.handleDelegatedClicks.bind(this));
-                    this.elements.professorLoginModal.querySelector('form').addEventListener('submit', this.handleProfessorLogin.bind(this));
-                    this.elements.homeworkModal.querySelector('form').addEventListener('submit', this.handleHomeworkSubmit.bind(this));
-                },
+            // --- App Logic ---
+            function showView(view) {
+                landingContainer.classList.add('hidden');
+                schedulerContainer.classList.add('hidden');
+                view.classList.remove('hidden');
+            }
 
-                handleDelegatedClicks(e) {
-                    const action = e.target.closest('[data-action]')?.dataset.action;
-                    if (!action) return;
+            function updatePanelView() {
+                initialChoiceView.classList.add('hidden');
+                panelView.classList.remove('hidden');
+                document.body.classList.remove('pattern-bg');
 
-                    const actions = {
-                        'login-google': this.loginWithGoogle,
-                        'login-guest': this.loginAsGuest,
-                        'logout': this.logout,
-                        'show-booking-modal': this.showBookingModal,
-                        'show-my-classes': this.myClassesModalLogic,
-                        'show-homework-request': this.showHomeworkModal,
-                        'show-about-us': () => this.showModal('quienes-somos-modal'),
-                        'show-professor-login': () => this.showModal('professor-login-modal'),
-                        'close-modal': () => {
-                            const modalId = e.target.closest('[data-modal-id]').dataset.modalId;
-                            this.hideModal(modalId);
-                        },
-                    };
+                if (USER_STATE && USER_STATE.name) { // Logged-in user
+                    document.getElementById('user-name').textContent = USER_STATE.name;
+                    panelOptions.innerHTML = `
+                        <div id="action-agendar-clase" class="main-card actionable flex items-center space-x-6">
+                            <div class="bg-teal-100 p-4 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-teal-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
+                            <div><h2 class="text-xl font-bold text-gray-800">Agendar Clase Nueva</h2><p class="text-gray-500">Reserva un nuevo espacio en el calendario.</p></div>
+                        </div>
+                        <div id="action-mis-clases" class="main-card actionable flex items-center space-x-6">
+                            <div class="bg-blue-100 p-4 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg></div>
+                            <div><h2 class="text-xl font-bold text-gray-800">Mis Clases Agendadas</h2><p class="text-gray-500">Consulta o cancela tus próximas clases.</p></div>
+                        </div>
+                        <div class="main-card flex items-center space-x-6 opacity-60 relative">
+                            <div class="bg-gray-100 p-4 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></div>
+                            <div><h2 class="text-xl font-bold text-gray-800">Apoyo con Tarea/Trabajo</h2><p class="text-gray-500">Te ayudamos a resolver tus dudas.</p></div>
+                            <span class="absolute top-4 right-4 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full">PRÓXIMAMENTE</span>
+                        </div>`;
+                } else { // Guest user
+                    document.getElementById('user-name').textContent = "Invitado";
+                    panelOptions.innerHTML = `
+                        <div id="action-agendar-clase" class="main-card actionable flex items-center space-x-6">
+                            <div class="bg-teal-100 p-4 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-teal-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
+                            <div><h2 class="text-xl font-bold text-gray-800">Agendar Clase</h2><p class="text-gray-500">Reserva un espacio en el calendario.</p></div>
+                        </div>
+                        <div class="main-card flex items-center space-x-6 opacity-60 relative">
+                            <div class="bg-gray-100 p-4 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></div>
+                            <div><h2 class="text-xl font-bold text-gray-800">Apoyo con Tarea/Trabajo</h2><p class="text-gray-500">Te ayudamos a resolver tus dudas.</p></div>
+                            <span class="absolute top-4 right-4 bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full">PRÓXIMAMENTE</span>
+                        </div>`;
+                }
+                document.getElementById('action-agendar-clase').addEventListener('click', () => showView(schedulerContainer));
+                const misClasesBtn = document.getElementById('action-mis-clases');
+                if (misClasesBtn) {
+                    misClasesBtn.addEventListener('click', () => showModal(myClassesModal));
+                }
+            }
 
-                    if (actions[action]) {
-                        actions[action].call(this);
-                    }
-                },
-                
-                showView(viewId) {
-                    Object.values(this.elements).forEach(el => {
-                        if (el && el.id !== 'modal-container' && !el.classList.contains('modal')) {
-                           // el.classList.add('hidden');
-                        }
-                    });
-                    if (this.elements[viewId]) {
-                        this.elements[viewId].classList.remove('hidden');
-                    }
-                },
+            googleSigninBtn.addEventListener('click', () => {
+                USER_STATE = { name: "Santiago", email: "santy@ejemplo.com" };
+                updatePanelView();
+            });
+            guestBtn.addEventListener('click', () => {
+                USER_STATE = 'GUEST';
+                updatePanelView();
+            });
+            backToAuthChoiceBtn.addEventListener('click', () => {
+                USER_STATE = null;
+                initialChoiceView.classList.remove('hidden');
+                panelView.classList.add('hidden');
+                document.body.classList.add('pattern-bg');
+            });
+            
+            backToPanelBtn.addEventListener('click', () => {
+                showView(landingContainer);
+                updatePanelView();
+                resetScheduler();
+            });
 
-                updatePanelView() {
-                    this.showView('landing-container');
-                    this.elements.initialChoiceView.classList.add('hidden');
-                    this.elements.panelView.classList.remove('hidden');
-                    document.body.classList.remove('pattern-bg');
-                    
-                    if (this.USER_STATE && this.USER_STATE.name) { // Logged-in user
-                        this.elements.userNameEl.textContent = this.USER_STATE.name;
-                        this.elements.panelOptions.innerHTML = `
-                            <div data-action="show-booking-modal" class="main-card actionable flex items-center space-x-6">...</div>
-                            <div data-action="show-my-classes" class="main-card actionable flex items-center space-x-6">...</div>
-                            <div data-action="show-homework-request" class="main-card actionable flex items-center space-x-6">...</div>`;
-                    } else { // Guest user
-                        this.elements.userNameEl.textContent = "Invitado";
-                        this.elements.panelOptions.innerHTML = `
-                            <div data-action="show-booking-modal" class="main-card actionable flex items-center space-x-6">...</div>
-                            <div data-action="show-homework-request" class="main-card actionable flex items-center space-x-6">...</div>`;
-                    }
-                },
+            // Rest of your scheduler and modal logic...
+            const durationSelect = document.getElementById('duration');
+            const monthYearEl = document.getElementById('month-year');
+            const calendarGridEl = document.getElementById('calendar-grid');
+            const prevMonthBtn = document.getElementById('prev-month');
+            const nextMonthBtn = document.getElementById('next-month');
+            const timeSlotView = document.getElementById('time-slot-view');
+            const initialMessage = document.getElementById('initial-message');
+            const timeSlotsContainer = document.getElementById('time-slots');
+            const timeSlotSubtitle = document.getElementById('time-slot-subtitle');
+            const confirmationSection = document.getElementById('confirmation-section');
+            const bookingForm = document.getElementById('booking-form');
+            const paymentRadios = document.querySelectorAll('input[name="payment"]');
+            
+            const successModal = document.getElementById('success-modal');
+            const successModalCloseBtn = document.getElementById('success-modal-close-btn');
+            const myClassesModal = document.getElementById('my-classes-modal');
+            const myClassesModalCloseBtn = document.getElementById('my-classes-modal-close-btn');
+            const quienesSomosModal = document.getElementById('quienes-somos-modal');
+            const quienesSomosModalCloseBtn = document.getElementById('quienes-somos-modal-close-btn');
 
-                loginWithGoogle() {
-                    this.USER_STATE = { name: "Santiago", email: "santy@ejemplo.com" };
-                    this.updatePanelView();
-                },
-                loginAsGuest() {
-                    this.USER_STATE = 'GUEST';
-                    this.updatePanelView();
-                },
-                logout() {
-                    this.USER_STATE = null;
-                    this.showView('landing-container');
-                    this.elements.initialChoiceView.classList.remove('hidden');
-                    this.elements.panelView.classList.add('hidden');
-                    document.body.classList.add('pattern-bg');
-                },
-                showBookingModal() {
-                    alert("Launch booking wizard");
-                },
-                myClassesModalLogic() {
-                    const list = this.elements.myClassesModal.querySelector('#my-classes-list');
-                    list.innerHTML = `...`; // Content for "My Classes"
-                    this.showModal('my-classes-modal');
-                },
-                showHomeworkModal() {
-                    const hwGuestInfo = this.elements.homeworkModal.querySelector('#homework-guest-info');
-                    const inputs = hwGuestInfo.querySelectorAll('input');
-                    if (this.USER_STATE === 'GUEST') {
-                        hwGuestInfo.classList.remove('hidden');
-                        inputs.forEach(el => el.required = true);
+            let currentDate = new Date();
+            let selectedDateObject = null;
+            let selectedDateElement = null;
+            let selectedTimeElement = null;
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const CLASS_PRICES = { 45: 30000, 60: 40000, 120: 70000, 180: 100000, 240: 130000 };
+            
+            function resetScheduler() {
+                confirmationSection.classList.add('hidden');
+                timeSlotView.classList.add('hidden');
+                initialMessage.classList.remove('hidden');
+                if(selectedDateElement) selectedDateElement.classList.remove('selected');
+                selectedDateElement = null;
+                selectedTimeElement = null;
+                selectedDateObject = null;
+                bookingForm.reset();
+                document.getElementById('efectivo-details').classList.add('hidden');
+                document.getElementById('transferencia-details').classList.add('hidden');
+            }
+            
+            const renderCalendar = () => {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                monthYearEl.textContent = `${monthNames[month]} ${year}`;
+                calendarGridEl.innerHTML = '';
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const today = new Date();
+                for (let i = 0; i < firstDayOfMonth; i++) calendarGridEl.innerHTML += `<div class="p-2"></div>`;
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayEl = document.createElement('div');
+                    dayEl.textContent = day;
+                    dayEl.className = 'calendar-day cursor-pointer p-2 rounded-full';
+                    const cellDate = new Date(year, month, day);
+                    if (cellDate < today.setHours(0,0,0,0)) {
+                        dayEl.classList.add('disabled', 'text-gray-400', 'cursor-not-allowed', 'line-through');
                     } else {
-                        hwGuestInfo.classList.add('hidden');
-                        inputs.forEach(el => el.required = false);
+                        dayEl.addEventListener('click', () => selectDate(day, dayEl, cellDate));
                     }
-                    this.showModal('homework-modal');
-                },
-                showModal(modalId) {
-                    const modalElement = document.getElementById(modalId);
-                    if (!modalElement) return;
-                    modalElement.classList.remove('hidden');
-                    setTimeout(() => {
-                        modalElement.classList.remove('opacity-0');
-                        modalElement.querySelector('.modal-content').classList.remove('scale-95');
-                    }, 10);
-                },
-                hideModal(modalId) {
-                    const modalElement = document.getElementById(modalId);
-                    if (!modalElement) return;
-                    modalElement.classList.add('opacity-0');
-                    modalElement.querySelector('.modal-content').classList.add('scale-95');
-                    setTimeout(() => {
-                        modalElement.classList.add('hidden');
-                        if (modalId === 'success-modal') {
-                           this.showView('landing-container');
-                        }
-                    }, 300);
-                },
-                handleProfessorLogin(e) {
-                    e.preventDefault();
-                    const password = e.target.querySelector('#prof-password').value;
-                    const errorEl = e.target.querySelector('#prof-login-error');
-                    if (password === 'sebas123') {
-                        this.hideModal('professor-login-modal');
-                        this.showView('professor-panel-view');
-                        document.body.classList.remove('pattern-bg');
-                        errorEl.classList.add('hidden');
-                        e.target.reset();
-                    } else {
-                        errorEl.classList.remove('hidden');
-                    }
-                },
-                handleHomeworkSubmit(e) {
-                    e.preventDefault();
-                    this.hideModal('homework-modal', () => {
-                        let studentInfo = '';
-                        if (this.USER_STATE === 'GUEST' || (this.USER_STATE && !this.USER_STATE.name)) {
-                            studentInfo = `...`;
-                        }
-                        
-                        document.getElementById('confirm-details').innerHTML = `...`;
-                        document.getElementById('success-modal-title').textContent = "Solicitud Recibida";
-                        this.showModal('success-modal');
-                    });
-                },
+                    calendarGridEl.appendChild(dayEl);
+                }
+            };
+            
+            const selectDate = async (day, element, dateObj) => {
+                if (selectedDateElement) selectedDateElement.classList.remove('selected');
+                element.classList.add('selected');
+                selectedDateElement = element;
+                selectedDateObject = dateObj;
+                initialMessage.classList.add('hidden');
+                timeSlotView.classList.remove('hidden');
+                timeSlotSubtitle.textContent = `Para el ${dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' })}`;
+                timeSlotsContainer.innerHTML = '<p class="text-gray-500 col-span-full text-center">Buscando horarios...</p>';
+                setTimeout(() => {
+                    const busySlots = [{ start: new Date(dateObj).setHours(10, 0, 0, 0), end: new Date(dateObj).setHours(11, 0, 0, 0) }];
+                    generateAvailableSlots(busySlots.map(s => ({ start: new Date(s.start), end: new Date(s.end) })), dateObj);
+                }, 500);
             };
 
-            app.init();
+            function generateAvailableSlots(busySlots, date) {
+                const workingHours = [ { start: 9, end: 13 }, { start: 14, end: 18 } ];
+                const availableTimes = [];
+                workingHours.forEach(block => {
+                    for (let hour = block.start; hour < block.end; hour++) {
+                        const slotTime = new Date(date);
+                        slotTime.setHours(hour, 0, 0, 0);
+                        let isBusy = busySlots.some(busy => slotTime >= busy.start && slotTime < busy.end);
+                        if (!isBusy) availableTimes.push(slotTime.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'}));
+                    }
+                });
+                renderTimeSlots(availableTimes);
+            }
+            
+            const renderTimeSlots = (times) => {
+                timeSlotsContainer.innerHTML = '';
+                confirmationSection.classList.add('hidden');
+                if (selectedTimeElement) selectedTimeElement = null;
+                if (times.length === 0) {
+                    timeSlotsContainer.innerHTML = '<p class="text-gray-500 col-span-full text-center">No hay horarios disponibles para este día.</p>';
+                    return;
+                }
+                times.forEach(time => {
+                    const timeEl = document.createElement('button');
+                    timeEl.textContent = time;
+                    timeEl.className = 'time-slot border border-gray-300 rounded-lg p-2 text-center cursor-pointer hover:bg-teal-500 hover:text-white hover:border-teal-500';
+                    timeEl.addEventListener('click', () => selectTime(time, timeEl));
+                    timeSlotsContainer.appendChild(timeEl);
+                });
+            };
+
+            const selectTime = (time, element) => {
+                if(selectedTimeElement) selectedTimeElement.classList.remove('selected');
+                element.classList.add('selected');
+                selectedTimeElement = element;
+                confirmationSection.classList.remove('hidden');
+                const guestInfo = document.getElementById('guest-info');
+                const nameInput = document.getElementById('name');
+                const emailInput = document.getElementById('email');
+                const phoneInput = document.getElementById('phone');
+
+                if (USER_STATE === 'GUEST') {
+                    guestInfo.classList.remove('hidden');
+                    nameInput.required = true;
+                    emailInput.required = true;
+                    phoneInput.required = true;
+                } else {
+                    guestInfo.classList.add('hidden');
+                    nameInput.required = false;
+                    emailInput.required = false;
+                    phoneInput.required = false;
+                }
+            };
+            
+            function updatePaymentDisplay() {
+                const selectedPayment = document.querySelector('input[name="payment"]:checked');
+                if (!selectedPayment) return;
+
+                const selectedDuration = durationSelect.value;
+                const price = CLASS_PRICES[selectedDuration];
+                const formattedPrice = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(price);
+
+                const efectivoDetails = document.getElementById('efectivo-details');
+                const transferenciaDetails = document.getElementById('transferencia-details');
+
+                if (selectedPayment.value === 'efectivo') {
+                    document.getElementById('valor-clase-efectivo').textContent = formattedPrice;
+                    efectivoDetails.classList.remove('hidden');
+                    transferenciaDetails.classList.add('hidden');
+                } else {
+                    document.getElementById('valor-clase-transferencia').textContent = formattedPrice;
+                    transferenciaDetails.classList.remove('hidden');
+                    efectivoDetails.classList.add('hidden');
+                }
+            }
+
+            paymentRadios.forEach(radio => radio.addEventListener('change', updatePaymentDisplay));
+            durationSelect.addEventListener('change', updatePaymentDisplay);
+
+            const showModal = (modalElement) => {
+                modalElement.classList.remove('hidden');
+                setTimeout(() => {
+                    modalElement.classList.remove('opacity-0');
+                    modalElement.querySelector('.modal-content').classList.remove('scale-95');
+                }, 10);
+            };
+
+            const hideModal = (modalElement, onHideCallback) => {
+                 modalElement.classList.add('opacity-0');
+                 modalElement.querySelector('.modal-content').classList.add('scale-95');
+                setTimeout(() => {
+                    modalElement.classList.add('hidden');
+                    if(onHideCallback) onHideCallback();
+                }, 300);
+            };
+
+            successModalCloseBtn.addEventListener('click', () => hideModal(successModal, () => showView(landingContainer)));
+            myClassesModalCloseBtn.addEventListener('click', () => hideModal(myClassesModal));
+            quienesSomosModalCloseBtn.addEventListener('click', () => hideModal(quienesSomosModal));
+
+            bookingForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const selectedPayment = document.querySelector('input[name="payment"]:checked');
+                if (!selectedPayment) {
+                    alert('Por favor, selecciona un método de pago.');
+                    return;
+                }
+                
+                const selectedDuration = durationSelect.value;
+                const price = CLASS_PRICES[selectedDuration];
+                const durationText = durationSelect.options[durationSelect.selectedIndex].text;
+
+                let paymentInstructions = '';
+                if (selectedPayment.value === 'efectivo') {
+                    paymentInstructions = `Pago en efectivo (${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(price)}) pendiente para el día de la clase.`;
+                } else {
+                    paymentInstructions = `Pago por transferencia (${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(price)}) a la cuenta Bancolombia Ahorros 123-456789-00. Por favor, envía el comprobante.`;
+                }
+
+                let studentName, studentPhone;
+
+                if (USER_STATE === 'GUEST') {
+                    studentName = document.getElementById('name').value;
+                    studentPhone = document.getElementById('phone').value;
+                } else {
+                    studentName = USER_STATE.name;
+                    studentPhone = null;
+                }
+
+                const detailsContainer = document.getElementById('confirm-details');
+                detailsContainer.innerHTML = `
+                    <p class="text-sm text-gray-600"><strong>Para:</strong> <span>${studentName}</span></p>
+                    ${studentPhone ? `<p class="text-sm text-gray-600"><strong>Celular:</strong> <span>${studentPhone}</span></p>` : ''}
+                    <p class="text-sm text-gray-600"><strong>Fecha:</strong> <span>${selectedDateObject.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+                    <p class="text-sm text-gray-600"><strong>Hora:</strong> <span>${selectedTimeElement.textContent}</span></p>
+                    <p class="text-sm text-gray-600"><strong>Duración:</strong> <span>${durationText}</span></p>
+                    <hr class="my-2">
+                    <p class="text-sm text-gray-600"><strong>Pago:</strong> <span>${paymentInstructions}</span></p>
+                `;
+                showModal(successModal);
+            });
+
+            quienesSomosBtn.addEventListener('click', () => showModal(quienesSomosModal));
+
+            const myClassesModalLogic = () => {
+                const list = document.getElementById('my-classes-list');
+                list.innerHTML = `
+                    <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-gray-800">Clase de Álgebra</p>
+                            <p class="text-sm text-gray-500">viernes, 20 de junio de 2025 - 11:00</p>
+                        </div>
+                        <button class="text-xs text-red-500 hover:underline">Cancelar</button>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-gray-800">Clase de Cálculo</p>
+                            <p class="text-sm text-gray-500">lunes, 23 de junio de 2025 - 15:00</p>
+                        </div>
+                        <button class="text-xs text-red-500 hover:underline">Cancelar</button>
+                    </div>
+                `;
+                 showModal(myClassesModal);
+            };
+
+
+            prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+            nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+            renderCalendar();
+            
         });
     </script>
 </body>
 </html>
+
